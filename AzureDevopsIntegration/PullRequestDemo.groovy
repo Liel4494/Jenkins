@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Library('Library') _
-@Field String creds = "SVC_algo_wrap-Air_and_Missile_Defense_Collection"
+@Field String creds = "SVC_algo_wrap-Creds"
 @Field String validationName = "Validation"
 @Field String genre = "Jenkins"
 
