@@ -1,0 +1,12 @@
+node('!master'){
+    stage('Checkout'){
+        checkout scm
+    }
+    stage('Proceed Seedfile'){
+        if(scm.branches[0].name == 'master') {
+            jobDsl removedJobAction: 'DISABLE', removedViewAction: 'DELETE', targets: 'Seedfile'
+        } else {
+            println "[INFO]  Not master branch. Do nothing."
+        }
+    }
+}

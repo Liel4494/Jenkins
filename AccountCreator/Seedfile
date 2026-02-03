@@ -1,0 +1,35 @@
+folder('devops') {
+    displayName('devops')
+    description('Folder for all DevOps/IT jobs')
+}
+
+folder('devops/it') {
+    description('Folder for all IT jobs')
+}
+
+pipelineJob('devops/it/Account Creator') {
+    definition {
+        cpsScm {
+            scm {
+                git {
+                    remote {
+                        url("https://bitbucket.org/morphisec/devops.account-creator")
+                        credentials("morphisec_devops_bitbucket")
+                    }
+                    branch("*/master")
+                }
+            }
+            scriptPath("accountCreator.groovy")
+        }
+    }
+    parameters {
+        stringParam('FIRST_NAME', '', 'Enter Employee First Name')
+        stringParam('LAST_NAME', '', 'Enter Employee Last Name')
+        stringParam('PHONE', '', 'Enter Employee Phone Number (Must Start With Country Code!)')
+        stringParam('EMPLOYEE_EMAIL_ADDRESS', '', 'Enter Employee Email Address')
+        booleanParam('Gsuite', false, 'Check to create Gsuite Account')
+        booleanParam('Office365', false, 'Check to create Office365 Account')
+        booleanParam('Slack', false, 'Check to create Slack Account')
+        booleanParam('Active_Directory', false, 'Check to create Active Directory Account')
+    }
+}
