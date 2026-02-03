@@ -27,6 +27,8 @@
   - Install the Generic-Webhook plugin.
   - Create new username and password credentials and use **access token** as the password.
   - Edit `PullRequestDemo.groovy` file, and modify the fields: `creds`, `validationName` and `genre` to suit your settings.
+    <img width="1118" height="817" alt="image" src="https://github.com/user-attachments/assets/76ac8bc9-01c8-4a4e-9623-e718232abdb5" />
+
   - In the job triggers check `Generic Webhook Trigger`, and create new variables:  
     1. Name: `rawPayload`.  
        Expression: `$`.  
@@ -45,6 +47,8 @@
        JSONPath marked.               
   - Set up token: `PullRequestDemo`. (**Must match the token in the service hook URL**)
   - In `Cause` field enter: `$repo_name - PR ID #$pr_id - $source_branch To $target_branch`
-  
+    <img width="1920" height="6261" alt="image" src="https://github.com/user-attachments/assets/1530475d-464a-4402-b487-5ef4ce60d85c" />
+
+
 
 
