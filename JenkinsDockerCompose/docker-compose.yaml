@@ -1,0 +1,40 @@
+version: '3.8'
+
+networks:
+  jenkins-net:
+    internal: true
+
+services:
+  jenkins-master:
+    image: jenkins/jenkins:lts
+    container_name: jenkins-master
+    restart: unless-stopped
+    ports:
+      # We map host 443 to the HTTPS port we define below
+      - "443:8443"
+      - "50000:50000"
+    volumes:
+      - /var/jenkins_master:/var/jenkins_home
+      # Mount the certificate folder
+      - ./certs:/var/jenkins_home/certs:ro
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=true
+      # Disable HTTP and enable HTTPS on port 8443
+      - JENKINS_OPTS=--httpPort=-1 --httpsPort=8443 --httpsKeyStore=/var/jenkins_home/certs/jenkins.p12 --httpsKeyStorePassword=Aa123456
+
+  jenkins-slave:
+    image: jenkins/inbound-agent:latest
+    entrypoint: ["/usr/local/bin/jenkins-agent"]
+    container_name: jenkins-slave
+    restart: unless-stopped
+    privileged: true
+    depends_on:
+      - jenkins-master
+    networks:
+      - jenkins-net
+    volumes:
+      - /var/slave_workspace:/home/jenkins/agent
+    environment:
+      - JENKINS_URL=https://jenkins-master:8433
+      - JENKINS_AGENT_NAME=jenkins-slave
+      - JENKINS_SECRET=Aa123456
