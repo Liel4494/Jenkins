@@ -18,6 +18,7 @@
   -in fullchain.pem \
   -name "jenkins" \
   -passout pass:Aa123456
+ sudo chmod 644 ./certs/jenkins.p12
  ```
 
  3. Create `jenkins_home` folder:
