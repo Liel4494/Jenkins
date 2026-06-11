@@ -10,7 +10,7 @@ def auth = "Basic " + pat.bytes.encodeBase64().toString()
 
 def branches = []
 try {
-    def url = "http://<Azure-Devops-URL>/${organization}/${project}/_apis/git/repositories/${repository}/refs?filter=heads/&api-version=6.0"
+    def url = "<Azure-Devops-URL>/${organization}/${project}/_apis/git/repositories/${repository}/refs?filter=heads/&api-version=6.0"
     def connection = new URL(url).openConnection()
     connection.setRequestProperty("Authorization", auth)
     connection.setRequestProperty("Content-Type", "application/json")
