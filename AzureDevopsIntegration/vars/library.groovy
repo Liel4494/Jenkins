@@ -112,7 +112,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         ],
         "commits": [
             {
-                "comment": "update ${fileDestinationPath} [skip ci]",
+                "comment": "update ${fileDestinationPath} - ${env.JOB_BASE_NAME} Build ${env.BUILD_NUMBER} [skip ci]",
                 "changes": [
                     {
                         "changeType": "edit",
