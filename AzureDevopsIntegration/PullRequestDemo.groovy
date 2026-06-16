@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter
 
 def json
 def prId
-def status
 def author
 def collection
 def project
@@ -22,7 +21,6 @@ def repo
 def repoUrl
 def sourceBranch
 def targetBranch
-def lastIterationID
 
 
 node("ILCPC"){
