@@ -15,7 +15,7 @@
   - Set Status Checks Policy Under branch policy:
     - In `Status to check` field, enter the name in this format: `genre/validationName`.  
       in this example `genre: Jenkins` and `validationName: Validation`
-    - Enter display name - make sure to change the `description` value in the pullRequest.groovy file.
+    - Enter display name - make sure to change the `description` value in the `pullRequest.groovy` file.
       <img width="738" height="891" alt="image" src="https://github.com/user-attachments/assets/6c024830-e94c-4395-b043-8e444ff09443" />
 
 <br>
