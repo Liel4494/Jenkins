@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter
 @Field String creds = "SVC_algo_wrap-Creds"
 @Field String validationName = "Validation"
 @Field String genre = "Jenkins"
+@Field String description = "Backand Pull Request"
 
 
 def json
@@ -47,7 +48,7 @@ node("ILCPC"){
         println("Target Branch: ${targetBranch}")
         println("===========================================================================================")
         
-        library.updateAzureStatusCheck(collection, project, repo, prId, "pending", validationName, genre, creds)
+        library.updateAzureStatusCheck(collection, project, repo, prId, "pending", validationName, genre, description,creds)
         
     }
             
@@ -71,13 +72,13 @@ node("ILCPC"){
             }
         }
         stage("Update PR Status"){
-                library.updateAzureStatusCheck(collection, project, repo, prId, "succeeded", validationName, genre, creds)
+                library.updateAzureStatusCheck(collection, project, repo, prId, "pending", validationName, genre, description,creds)
         }
     }
 
     catch (Exception e) {
         stage("Update PR Status"){
-            library.updateAzureStatusCheck(collection, project, repo, prId, "failed", validationName, genre, creds)
+            library.updateAzureStatusCheck(collection, project, repo, prId, "pending", validationName, genre, description,creds)
         }
     }
 }
