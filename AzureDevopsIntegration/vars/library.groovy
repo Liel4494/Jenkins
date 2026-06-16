@@ -32,13 +32,13 @@ def getLatestIterationID(creds, collection, project, repo, prId){
 }
 
 
-def updateAzureStatusCheck(collection, project, repo, prId, status, validationName, genre, creds){
+def updateAzureStatusCheck(collection, project, repo, prId, status, validationName, genre,description, creds){
     def lastIterationID = getLatestIterationID(creds, collection, project, repo, prId)
 
     def body = """{
         "iterationId": ${lastIterationID},
         "state": "${status}",
-        "description": "Jenkins Pipeline",
+        "description": "${description}",
         "context": {
         "name": "${validationName}",
         "genre": "${genre}"
