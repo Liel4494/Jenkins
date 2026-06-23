@@ -25,14 +25,14 @@ def getLatestIterationID(creds, collection, project, repo, prId){
     else{
         def iterationJson = readJSON text: response.content
         def lastIterationID = iterationJson.count
-        println("lastIterationID: ${lastIterationID} ")
+        println("# lastIterationID: ${lastIterationID} ")
 
         return lastIterationID
     }
 }
 
 
-def updateAzureStatusCheck(collection, project, repo, prId, status, validationName, genre,description, creds){
+def updateAzureStatusCheck(collection, project, repo, prId, status, validationName, genre, description, creds){
     def lastIterationID = getLatestIterationID(creds, collection, project, repo, prId)
 
     def body = """{
@@ -65,6 +65,76 @@ def updateAzureStatusCheck(collection, project, repo, prId, status, validationNa
 }
 
 // Example:
+// generic_library.getPullRequestChanges("Air_and_Missile_Defense_Collection", "ADOptimizer", "Backend", "12815", apiCreds)
+def getPullRequestChanges(collection, project, repo, prId, creds) {
+    println("\n# Getting Changed Files For PR #${prId}")
+    def iterationId = getLatestIterationID(creds, collection, project, repo, prId)
+    def response = httpRequest authentication: creds,
+        quiet: true,
+        consoleLogResponseBody: true,
+        contentType: 'APPLICATION_JSON',
+        httpMode: "GET",
+        ignoreSslErrors: true,
+        responseHandle: 'NONE',
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations/${iterationId}/changes?api-version=7.1",
+        wrapAsMultipart: false
+
+    if (response.status != 200) {
+        println("## Getting PR Changes Failed")
+        println("response.status: ${response.status}")
+        println("response: ${response.content}")
+        error("# Exiting: Get PR Changes Failed - Stopping Build.")
+    }
+
+    def changesJson = readJSON text: response.content
+    def changedFiles = (changesJson.changeEntries ?: [])
+        .findAll { it.item != null && it.item.path != null }
+        .collect { it.item.path }
+
+    println("---------------------------------------------------------------------------------------------")
+    println("# Changed Files:")
+    changedFiles.each { println("  - ${it}") }
+    println("---------------------------------------------------------------------------------------------")
+
+    return changedFiles
+}
+
+
+// Example:
+// generic_library.getCommitChanges("Air_and_Missile_Defense_Collection", "ADOptimizer", "Backend", apiCreds)
+def getCommitChanges(collection, project, repo, branch, creds) {
+    commitId = getLastCommitID(creds, collection, project, repo, branch)
+    println("\n# Getting Changed Files For Commit ${commitId}")
+    def response = httpRequest authentication: creds,
+        quiet: true,
+        consoleLogResponseBody: true,
+        contentType: 'APPLICATION_JSON',
+        httpMode: "GET",
+        ignoreSslErrors: true,
+        responseHandle: 'NONE',
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits/${commitId}/changes?api-version=7.1",
+        wrapAsMultipart: false
+
+    if (response.status != 200) {
+        println("## Getting Commit Changes Failed")
+        println("response.status: ${response.status}")
+        println("response: ${response.content}")
+        error("# Exiting: Get Commit Changes Failed - Stopping Build.")
+    }
+
+    def changesJson = readJSON text: response.content
+    def changedFiles = changesJson.changes.collect { it.item.path }
+
+    println("---------------------------------------------------------------------------------------------")
+    println("# Changed Files:")
+    changedFiles.each { println("  - ${it}") }
+    println("---------------------------------------------------------------------------------------------")
+
+    return changedFiles
+}
+
+
+// Example:
 // generic_library.pushToRepo(apiCreds, "Air_and_Missile_Defense_Collection", "DevopsSA", "DevopsSA.liel.cohen", "master", "SA/ReleaseNote.yml", "SA/ReleaseNote.yml", "2")
 def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPath, fileDestinationPath, counter) {
     println("\n# Pushing '${fileLocalPath}' to Branch: ${branch}\n")
@@ -75,6 +145,8 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
     println("fileLocalPath: ${fileLocalPath}")
     println("fileDestinationPath: ${fileDestinationPath}")
 
+    counter = counter.toInteger()
+    def fileName = fileLocalPath.tokenize('/')[-1]
     def fileContent = readFile(file: fileLocalPath, encoding: 'UTF-8')
     println("** fileContent **************************************************************************")
     println("${fileContent}")
@@ -112,7 +184,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         ],
         "commits": [
             {
-                "comment": "update ${fileDestinationPath} - #${env.JOB_BASE_NAME} Build #${env.BUILD_NUMBER} [skip ci]",
+                "comment": "Update ${fileName} - #${env.JOB_BASE_NAME} Build #${env.BUILD_NUMBER} [skip ci]",
                 "changes": [
                     {
                         "changeType": "edit",
@@ -319,6 +391,7 @@ def downloadFile(creds, collection, projectName, fileRepo, filePath, fileBranch,
     writeFile file: saveAs, text: fileResponse.content, encoding: 'UTF-8'
     println("## File Saved To: ${saveAs}")
 }
+
 
 
 @NonCPS
@@ -699,4 +772,106 @@ def uploadWikiAttachments(creds, collection, project, String attachmentList) {
             }
         }
     }
+}
+
+def updateChartVersion(chartFilePath) {
+    def chartContent = readFile(file: chartFilePath, encoding: 'UTF-8')
+    def oldVersion = (chartContent =~ /appVersion:\s*'?"?([^\s'"]+)'?"?/)[0][1]
+    println("\n# Old Version: ${oldVersion}")
+
+    def newVersion
+    def parts = oldVersion.split('-')
+
+    if (parts.size() == 3) {
+        // integration/X.X.X branches with fixes contains version format: X.X.X-label-X
+        // X.X.X-label-X  →  X.X.X-label-(X+1)
+        def semver = parts[0]
+        def label  = parts[1]
+        def num    = parts[2].toInteger()
+        newVersion = "${semver}-${label}-${num + 1}"
+
+    } else if (parts.size() == 2 && parts[1] ==~ /[0-9]+/) {
+        // release/X.X.X branches with hotfix contains version format: X.X.X-X
+        // X.X.X-X  →  X.X.X-(X+1)
+        def semver = parts[0]
+        def num    = parts[1].toInteger()
+        newVersion = "${semver}-${num + 1}"
+
+    } else if (parts.size() == 2) {
+        if (parts[1].startsWith('rc')) {
+            // integration/X.X.X branches with rc contains version format: X.X.X-rc-X
+            // X.X.X-rc-X  →  X.X.X-rc-(X+1)
+            def semver = parts[0]
+            def label  = parts[1].takeWhile { it.isLetter() }
+            def num    = parts[1].dropWhile { it.isLetter() }.toInteger()
+            newVersion = "${semver}-${label}${num + 1}"
+        }
+        else if (parts[1].startsWith('dev')) {
+            // develop branch contains version format: X.X.X-dev
+            // X.X.X-dev  →  X.X.(X+1)-dev
+            def label      = parts[1]
+            def semverParts = parts[0].split('\\.')
+            def patch      = semverParts[2].toInteger() + 1
+            newVersion = "${semverParts[0]}.${semverParts[1]}.${patch}-${label}"
+        }
+    } else {
+        // release/X.X.X branches with no hotfix contains version format: X.X.X
+        // X.X.X  →  X.X.X-1
+        newVersion = "${oldVersion}-1"
+    }
+
+    println("# New Version: ${newVersion}")
+
+    def updatedContent = chartContent.replaceAll(
+        /(appVersion:\s*'?"?)[^\s'"]+('?"?)/,
+        "\$1${newVersion}\$2"
+    )
+    writeFile file: chartFilePath, text: updatedContent, encoding: 'UTF-8'
+
+    return newVersion.toString()
+}
+
+/*
+ Searches for a directory by name in the given repository and branch.
+ Makes a single API call to get the full recursive repo tree, then finds the matching folder.
+ Returns the full path of the directory, or null if not found.
+ Example:
+    def path = generic_library.getDirectoryPath(apiCreds, "Air_and_Missile_Defense_Collection", "ADOptimizer", "Backend", "develop", "data-manager")
+*/
+def getDirectoryPath(creds, collection, project, repo, branch, String dirName) {
+    println("\n# Searching for directory '${dirName}' in ${repo} 'branch' '${branch}'")
+    def response = httpRequest authentication: creds,
+        quiet: true,
+        consoleLogResponseBody: true,
+        contentType: 'APPLICATION_JSON',
+        httpMode: "GET",
+        ignoreSslErrors: true,
+        responseHandle: 'NONE',
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&recursionLevel=Full",
+        wrapAsMultipart: false
+
+    if (response.status != 200) {
+        println("## Getting Repo Structure Failed")
+        println("response.status: ${response.status}")
+        println("response: ${response.content}")
+        error("# Exiting: Get Repo Structure Failed - Stopping Build.")
+    }
+
+    if (!response.content) {
+        error("# Exiting: Empty response from API - Stopping Build.")
+    }
+
+    def itemsJson = readJSON text: response.content
+    def dirPath = itemsJson.value
+        .findAll { it.isFolder == true && it.path != '/' }
+        .find    { it.path.tokenize('/')[-1] == dirName }
+        ?.path
+
+    if (dirPath) {
+        println("# Directory '${dirName}' found at: ${dirPath}")
+    } else {
+        println("# Directory '${dirName}' not found in ${repo}@${branch}")
+        error("# Exiting: Directory Not Found - Stopping Build.")
+    }
+    return dirPath
 }
