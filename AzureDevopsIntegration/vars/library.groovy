@@ -182,9 +182,9 @@ def getCommitChanges(collection, project, repo, branch, creds) {
 // generic_library.pushToRepo(apiCreds, "...", "...", "repo", "branch", ["file1.yml","file2.yml"], ["dest/file1.yml","dest/file2.yml"], "2")
 def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPaths, fileDestinationPaths, counter) {
     // Normalize single string → single-element list (backward compat)
-    if (fileLocalPaths instanceof String) {
-        fileLocalPaths       = [fileLocalPaths]
-        fileDestinationPaths = [fileDestinationPaths]
+    if (fileLocalPaths instanceof CharSequence) {
+        fileLocalPaths       = [fileLocalPaths.toString()]
+        fileDestinationPaths = [fileDestinationPaths.toString()]
     }
 
     println("\n# Pushing ${fileLocalPaths.size()} file(s) to Branch: ${branch}\n")
@@ -279,8 +279,8 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
 
 
 // Example:
-// generic_library.createTag(apiCreds, "Air_and_Missile_Defense_Collection", "ADOptimizer", "avs_4_ado", "master", "1.0.0")
-def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag) {
+// generic_library.createTag(apiCreds, "Air_and_Missile_Defense_Collection", "ADOptimizer", "avs_4_ado", "master", "1.0.0", "branch")
+def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag, versionType = "branch") {
     println("\n# Create Tag In: ${projectToTag}, repo: ${repoToTag}, Branch: ${branchToTag}\n")
     println("collection: ${collection}")
     println("project_to_tag: ${projectToTag}")
@@ -288,7 +288,7 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag) {
     println("branch: ${branchToTag}")
     println("tag: ${tag}")
 
-    println("\n# Getting Latest Commit ID of ${branchToTag} Branch In ${repoToTag}")
+    println("\n# Getting Latest Commit ID Of ${branchToTag} Branch In ${repoToTag}")
     def commitResponse = httpRequest authentication: creds,
         quiet: true,
         consoleLogResponseBody: true,
@@ -296,9 +296,9 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.itemVersion.versionType=${versionType}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
-
+    
     def commitId
     if (commitResponse.status == 200) {
         def commitJson = readJSON text: commitResponse.content
@@ -306,28 +306,10 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag) {
         println("commitId: ${commitId}")
     }
     else {
-        if (commitResponse.status == 404) {
-            println("\n## Trying To Get Latest Commit ID of 'dev' Branch In ${repoToTag}")
-            def devResponse = httpRequest authentication: creds,
-                quiet: true,
-                consoleLogResponseBody: true,
-                contentType: 'APPLICATION_JSON',
-                httpMode: "GET",
-                ignoreSslErrors: true,
-                responseHandle: 'NONE',
-                url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=dev&searchCriteria.\$top=1&api-version=6.0",
-                wrapAsMultipart: false
-
-            def devJson = readJSON text: devResponse.content
-            commitId = devJson.value[0].commitId
-            println("commitId: ${commitId}")
-        }
-        else {
-            println("## Getting Latest Commit Failed")
-            println("response.status: ${commitResponse.status}")
-            println("response: ${commitResponse.content}")
-            error("# Exiting: Get Latest Commit Failed - Stopping Build.")
-        }
+        println("## Getting Latest Commit Failed")
+        println("response.status: ${commitResponse.status}")
+        println("response: ${commitResponse.content}")
+        error("# Exiting: Get Latest Commit Failed - Stopping Build.")
     }
 
     println("## Creating Tag")
@@ -600,6 +582,47 @@ def getLastCommitID(creds, collection, project, repo, branch) {
     return commitId
 }
 
+
+def findTag(creds, collection, projectName, repoName, tagToSearch) {
+    println("collection: ${collection}")
+    println("projectName: ${projectName}")
+    println("repoName: ${repoName}")
+    println("tag to search: ${tagToSearch}")
+
+    println("\n# Getting Tag\n")
+    def tagsResponse = httpRequest authentication: creds,
+        quiet: true,
+        consoleLogResponseBody: true,
+        contentType: 'APPLICATION_JSON',
+        httpMode: "GET",
+        ignoreSslErrors: true,
+        responseHandle: 'NONE',
+        validResponseCodes: '100:500',
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
+        wrapAsMultipart: false
+
+    if (tagsResponse.status != 200) {
+        println("## Getting Tag Failed")
+        println("response.status: ${tagsResponse.status}")
+        println("response: ${tagsResponse.content}")
+        error("# Exiting: Get Tags Failed - Stopping Build.")
+    }
+
+    def tagsJson = readJSON text: tagsResponse.content
+    def tagList = tagsJson.value.collect { tag ->
+        tag.name.replace('refs/tags/', '')
+    }
+    if (tagToSearch in tagList) {
+        println("# Tag ${tagToSearch} found successfully in ${repoName} repo.")
+        return true
+    }
+    else{
+        println("# Tag ${tagToSearch} not found in ${repoName} repo.")
+        return false
+    }
+}
+
+
 // Example:
 // generic_library.getLastVersionTag(azureAPI_Token, "Air_and_Missile_Defense_Collection", "ADOptimizer", "avs_4_ado", "")
 def getLastVersionTag(creds, collection, projectName, repoName, tagToSearch) {
@@ -859,6 +882,33 @@ def updateChartVersion(chartFilePath) {
 
     } else {
         error("Unrecognized version format: ${oldVersion}")
+    }
+
+    println("# New Version: ${newVersion}")
+
+    chartContent.appVersion = newVersion
+    writeYaml file: chartFilePath, data: chartContent, overwrite: true
+
+    return newVersion.toString()
+}
+
+
+def updateChartMinorVersion(chartFilePath) {
+    def chartContent = readYaml file: chartFilePath
+    def oldVersion = chartContent.appVersion
+    println("\n# Old Version: ${oldVersion}")
+
+    def newVersion
+    def parts = oldVersion.split('-')
+
+    if (parts.size() == 1) {
+        // X.X.X  →  X.(X+1).0
+        def semverParts = parts[0].split('\\.')
+        def minor = semverParts[1].toInteger() + 1
+        newVersion = "${semverParts[0]}.${minor}.0"
+
+    } else {
+        error("Unrecognized version format for minor update: ${oldVersion}")
     }
 
     println("# New Version: ${newVersion}")
