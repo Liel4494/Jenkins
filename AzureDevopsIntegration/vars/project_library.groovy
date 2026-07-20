@@ -108,7 +108,7 @@ def categorizeService(creds, collection, project, repo, branch, String service) 
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&scopePath=/services&recursionLevel=Full",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&scopePath=/services&recursionLevel=Full",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -327,7 +327,7 @@ def createBranch(branchName, creds, collection, project, repo, baseBranch) {
         requestBody: body,        
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=7.1",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=7.1",
         wrapAsMultipart: false
 
     if (response.status != 200) {
