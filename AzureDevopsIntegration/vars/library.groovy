@@ -15,7 +15,7 @@ def getLatestIterationID(creds, collection, project, repo, prId){
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations?includeCommits=true&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations?includeCommits=true&api-version=6.0",
         wrapAsMultipart: false
 
     if (response.status != 200 && response.status != 201) {
@@ -55,7 +55,7 @@ def updateAzureStatusCheck(collection, project, repo, prId, status, validationNa
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/statuses?api-version=6.0-preview.1",
+        url: "https://azuredevops..co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/statuses?api-version=6.0-preview.1",
         wrapAsMultipart: false
     
     if (response.status != 200 && response.status != 201) {
@@ -76,7 +76,7 @@ def getPullRequestChanges(collection, project, repo, prId, creds) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations/${iterationId}/changes?api-version=7.1",
+        url: "https://azuredevops..co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations/${iterationId}/changes?api-version=7.1",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -132,7 +132,7 @@ def getCommitChanges(collection, project, repo, branch, creds) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits/${commitId}/changes?api-version=7.1",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits/${commitId}/changes?api-version=7.1",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -219,7 +219,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
 
     if (commitResponse.status != 200) {
@@ -254,7 +254,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/pushes?api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/pushes?api-version=6.0",
         wrapAsMultipart: false
 
     if (pushResponse.status == 201) {
@@ -296,7 +296,7 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag, vers
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.itemVersion.versionType=${versionType}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.itemVersion.versionType=${versionType}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
     
     def commitId
@@ -329,7 +329,7 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag, vers
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/annotatedtags?api-version=6.0-preview",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/annotatedtags?api-version=6.0-preview",
         wrapAsMultipart: false
 
     if (tagResponse.status == 201) {
@@ -370,7 +370,7 @@ def deleteTag(creds, collection, project, repo, tag) {
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=6.0-preview",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=6.0-preview",
         wrapAsMultipart: false
 
     if (deleteResponse.status == 200) {
@@ -401,7 +401,7 @@ def downloadFile(creds, collection, projectName, fileRepo, filePath, fileBranch,
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${fileRepo}/items?path=${filePath}&versionType=Branch&version=${fileBranch}&download=true&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${fileRepo}/items?path=${filePath}&versionType=Branch&version=${fileBranch}&download=true&api-version=6.0",
         wrapAsMultipart: false
 
     if (fileResponse.status != 200) {
@@ -462,7 +462,7 @@ def getLatestArtifactoryVersion(String artifactoryCreds, jf_path) {
     def jfrogCliPath = tool name: 'jfrog-cli', type: 'jfrog'
     withCredentials([usernamePassword(credentialsId: artifactoryCreds, passwordVariable: 'JFROG_ACCESS_TOKEN', usernameVariable: 'username')]) {
         searchResult = sh(
-            script: "${jfrogCliPath}/jf rt search --url=https://artifactory.rafael.co.il/artifactory --access-token=\$JFROG_ACCESS_TOKEN ${jf_path}",
+            script: "${jfrogCliPath}/jf rt search --url=https://artifactory.myDomain.co.il/artifactory --access-token=\$JFROG_ACCESS_TOKEN ${jf_path}",
             returnStdout: true
         ).trim()
     }
@@ -565,7 +565,7 @@ def getLastCommitID(creds, collection, project, repo, branch) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
 
     if (commitResponse.status != 200) {
@@ -598,7 +598,7 @@ def findTag(creds, collection, projectName, repoName, tagToSearch) {
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:500',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
         wrapAsMultipart: false
 
     if (tagsResponse.status != 200) {
@@ -639,7 +639,7 @@ def getLastVersionTag(creds, collection, projectName, repoName, tagToSearch) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
         wrapAsMultipart: false
 
     if (tagsResponse.status != 200) {
@@ -714,7 +714,7 @@ def uploadToWiki(creds, collection, project, wikiFileDirectory, markdownContent)
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:599',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
         wrapAsMultipart: false
 
     if (response.status == 201) {
@@ -758,7 +758,7 @@ def checkWikiPathExist(creds, collection, project, wikiFileDirectory, markdownCo
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:599',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
         wrapAsMultipart: false
 
     if (checkResponse.status == 200) {
@@ -830,7 +830,7 @@ def uploadWikiAttachments(creds, collection, project, String attachmentList) {
                     -H "Content-Type: application/octet-stream" \\
                     --data-binary @"${attachment}" \\
                     -o /dev/null -w "%{http_code}" \\
-                    "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/attachments?name=${attachmentName}&api-version=6.0"
+                    "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/attachments?name=${attachmentName}&api-version=6.0"
                 """,
                 returnStdout: true
             ).trim()
@@ -935,7 +935,7 @@ def getDirectoryPath(creds, collection, project, repo, branch, String dirName) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&recursionLevel=Full",
+        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&recursionLevel=Full",
         wrapAsMultipart: false
 
     if (response.status != 200) {
