@@ -86,15 +86,9 @@
 <td align="center">
 
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-
-    <!-- TOP ACCENT STRIPE -->
-    <tr>
-      <td style="height:6px; background-color:#111827; background-image:linear-gradient(90deg, #6366f1 0%, #06b6d4 50%, #22c55e 100%); font-size:0; line-height:0;">&nbsp;</td>
-    </tr>
-
     <!-- HEADER: color changes based on build status -->
     <tr>
-      <td style="background-color:__STATUS_COLOR__; background-image:linear-gradient(135deg, __STATUS_COLOR__ 0%, #1f2937 130%); padding:26px 32px;">
+      <td style="background-color:__STATUS_COLOR__; padding:26px 32px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td>
@@ -141,26 +135,26 @@
             <!-- Button 1: View Build -->
             <td>
               <!--[if mso]>
-              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="$BUILD_URL" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#3730a3" fillcolor="#4338ca">
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="$BUILD_URL" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#3730a3" fillcolor="#ecdbff">
                 <w:anchorlock/>
-                <center style="color:#ffffff;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">View Build</center>
+                <center style="color:#7f00d3;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">View Build</center>
               </v:roundrect>
               <![endif]-->
               <!--[if !mso]><!-->
-              <a href="$BUILD_URL" target="_blank" style="background-color:#7600fc1e; border:1px solid #3830a393; border-radius:6px; color:#ac00fc; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">View Build</a>
+              <a href="$BUILD_URL" target="_blank" style="background-color:#ecdbff; border:1px solid #3730a3; border-radius:6px; color:#7f00d3; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">View Build</a>
               <!--<![endif]-->
             </td>
             <td style="width:10px; font-size:0; line-height:0;">&nbsp;</td>
             <!-- Button 2: Console Output -->
             <td>
               <!--[if mso]>
-              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${BUILD_URL}console" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#0891b2" fillcolor="#ecfeff">
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${BUILD_URL}console" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#0099f1" fillcolor="#dcefff">
                 <w:anchorlock/>
-                <center style="color:#0e7490;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">Console Output</center>
+                <center style="color:#2c64ff;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">Console Output</center>
               </v:roundrect>
               <![endif]-->
               <!--[if !mso]><!-->
-              <a href="${BUILD_URL}console" target="_blank" style="background-color:#00defc2a; border:1px solid #01a1c9; border-radius:6px; color:#04bdf0; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Console Output</a>
+              <a href="${BUILD_URL}console" target="_blank" style="background-color:rgba(0, 140, 255, 0.137); border:1px solid rgb(0, 153, 241); border-radius:6px; color:rgb(44, 100, 255); display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Console Output</a>
               <!--<![endif]-->
             </td>
             <td style="width:10px; font-size:0; line-height:0;">&nbsp;</td>
@@ -173,7 +167,7 @@
               </v:roundrect>
               <![endif]-->
               <!--[if !mso]><!-->
-              <a href="${BUILD_URL}stages/" target="_blank" style="background-color:#ecfdf5; border:1px solid #059669; border-radius:6px; color:#02d89b; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Pipeline Overview</a>
+              <a href="${BUILD_URL}stages/" target="_blank" style="background-color:#ecfdf5; border:1px solid #059669; border-radius:6px; color:#047857; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Pipeline Overview</a>
               <!--<![endif]-->
             </td>
           </tr>
@@ -197,7 +191,7 @@ __CONSOLE_LOG__
     <!-- FOOTER -->
     <tr>
       <td style="padding:28px 32px; text-align:center;">
-        <div style="font-size:13px; color:#9ca3af; border-top:2px solid; border-image:linear-gradient(90deg, #6366f1, #06b6d4, #22c55e) 1; padding-top:16px;">
+        <div style="font-size:13px; color:#9ca3af; border-top:2px solid #6366f1; padding-top:16px;">
           Sent by Jenkins &middot; <a href="$JENKINS_URL" style="color:#6366f1; text-decoration:none;">$JENKINS_URL</a><br>
           $PROJECT_NAME &middot; Build #$BUILD_NUMBER
         </div>
