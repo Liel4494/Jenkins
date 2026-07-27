@@ -1,0 +1,214 @@
+<!--
+  Jenkins Email-Ext HTML Template
+  ================================
+  How to use:
+  1. Global default: Manage Jenkins > System > Editable Email Notification
+     > Default Content (paste directly, set Content Type to HTML)
+  2. Per job (freestyle): Post-build Action > Editable Email Notification
+     > Content field (paste directly, set Content Type to HTML)
+  3. Pipeline: do NOT use the SCRIPT or FILE content tokens (with a
+     template/path parameter) to inline this file — SCRIPT parses the
+     file as raw Groovy code via SimpleTemplateEngine, and FILE just
+     inlines the raw bytes unexpanded, so neither one expands the token
+     placeholders below. Instead, read the file into a string and pass
+     it as the body directly:
+
+       def htmlBody = readFile('Jenkins_Build.html')
+
+       // __STATUS_COLOR__, __DURATION__, __NODE_NAME__, __CONSOLE_LOG__ are
+       // NOT real email-ext tokens (no such tokens exist in the plugin's
+       // Content Token Reference) so substitute them manually before
+       // handing the string to emailext. Also set currentBuild.result
+       // explicitly in any catch block BEFORE this runs - error() alone
+       // doesn't update it until the whole script exits, so a caught/
+       // rethrown failure would otherwise still read as SUCCESS here:
+       def statusColor = [
+         SUCCESS : '#16a34a',
+         FAILURE : '#dc2626',
+         UNSTABLE: '#f59e0b',
+         ABORTED : '#6b7280'
+       ].get(currentBuild.currentResult, '#6b7280')
+
+       // __CONSOLE_LOG__: fully-rendered HTML, one <div> per log line (not
+       // a '\n'-joined string - Outlook's Word engine ignores CSS
+       // white-space and collapses newlines into a wall of text). If this
+       // job was triggered downstream via `build job:`, include BOTH the
+       // upstream build's console and this pipeline's own console; if run
+       // standalone, include only this pipeline's own console. See
+       // generic_library.sendBuildEmail for the full implementation.
+
+       emailext(
+         subject: '${JOB_NAME} #${BUILD_NUMBER} - ${BUILD_STATUS}',
+         body: htmlBody,
+         mimeType: 'text/html',
+         to: 'someone@example.com'
+       )
+
+     Everything else in the string (still real content-token syntax from
+     the plugin's actual Content Token Reference) goes through email-ext's
+     normal token-macro expansion at send time, same as pasting into the
+     Content field in the UI.
+
+     WARNING: TokenMacro.expandAll() scans the ENTIRE raw body string for
+     ${...} / $WORD patterns, including text inside HTML comments — it has
+     no notion of "this is just documentation". If ANY match resolves to a
+     real macro name with invalid/garbage parameters, evaluation throws and
+     email-ext silently aborts expansion for the WHOLE body (logging only
+     "Error evaluating token: ..." to the console, not the email), leaving
+     every token below as literal unexpanded text. So never write real
+     token names using ${...} syntax anywhere in this file, even in prose.
+
+  Tokens used below are all verified against the Content Token Reference
+  (email-ext's own private macros + the bundled Token Macro plugin):
+  BUILD_STATUS, BUILD_NUMBER, PROJECT_NAME, CAUSE, BUILD_URL, JENKINS_URL.
+  __STATUS_COLOR__ / __DURATION__ / __NODE_NAME__ / __CONSOLE_LOG__ are
+  custom placeholders (not plugin tokens) substituted in Groovy above —
+  __CONSOLE_LOG__ is pre-rendered HTML (one section per source, one <div>
+  per line) rather than plain text; see generic_library.sendBuildEmail.
+  (Deliberately not shown here using real ${...} syntax — see the WARNING
+  above.)
+
+  NOTE: CULPRITS is NOT a content token (it only exists as a recipient
+  provider for choosing who receives the email), so it was deliberately
+  left out of the body here — using it as a token would render as
+  literal, unexpanded text in the sent email.
+-->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${PROJECT_NAME} - Build #${BUILD_NUMBER} - ${BUILD_STATUS}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7; font-family:'Segoe UI', Arial, sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7; padding:24px 0;">
+<tr>
+<td align="center">
+
+  <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+
+    <!-- TOP ACCENT STRIPE -->
+    <tr>
+      <td style="height:6px; background-color:#111827; background-image:linear-gradient(90deg, #6366f1 0%, #06b6d4 50%, #22c55e 100%); font-size:0; line-height:0;">&nbsp;</td>
+    </tr>
+
+    <!-- HEADER: color changes based on build status -->
+    <tr>
+      <td style="background-color:__STATUS_COLOR__; background-image:linear-gradient(135deg, __STATUS_COLOR__ 0%, #1f2937 130%); padding:26px 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td>
+              <span style="display:inline-block; background-color:rgba(255,255,255,0.2); color:#ffffff; font-size:14px; font-weight:700; letter-spacing:0.5px; padding:5px 12px; border-radius:20px; font-family:'Segoe UI', Arial, sans-serif;">
+                $BUILD_STATUS
+              </span>
+            </td>
+            <td align="right" style="color:#ffffff; font-size:15px; font-family:'Segoe UI', Arial, sans-serif; opacity:0.9;">
+              Build #$BUILD_NUMBER
+            </td>
+          </tr>
+        </table>
+        <div style="color:#ffffff; font-size:22px; font-weight:700; margin-top:12px;">
+          $PROJECT_NAME &nbsp;#$BUILD_NUMBER &middot; $BUILD_STATUS
+        </div>
+      </td>
+    </tr>
+
+    <!-- SUMMARY BAND -->
+    <tr>
+      <td style="padding:20px 32px 0 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; background-color:#f8fafc; border-radius:6px;">
+          <tr>
+            <td style="padding:12px 16px; font-size:15px; color:#ec18ff; font-weight:600; width:35%; border-left:3px solid #e201c4; background-color:#fdf4ff;" bgcolor="#fdf4ff">🚀 Triggered by</td>
+            <td style="padding:12px 16px; font-size:15px; color:#111827; font-weight:500; background-color:#fdf4ff;" bgcolor="#fdf4ff">$CAUSE</td>
+          </tr>
+          <tr>
+            <td style="padding:12px 16px; font-size:15px; color:#00d7df; font-weight:600; border-left:3px solid #5cf1f6; background-color:#ecfeff;" bgcolor="#ecfeff">🖥️ Node</td>
+            <td style="padding:12px 16px; font-size:15px; color:#111827; font-weight:500; background-color:#ecfeff;" bgcolor="#ecfeff">__NODE_NAME__</td>            
+          </tr>
+          <tr>
+            <td style="padding:12px 16px; font-size:15px; color:#f59e0b; font-weight:600; border-left:3px solid #f59e0b; background-color:#fef9c3;" bgcolor="#fef9c3">⏱️ Duration</td>
+            <td style="padding:12px 16px; font-size:15px; color:#111827; font-weight:500; background-color:#fef9c3;" bgcolor="#fef9c3">__DURATION__</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- ACTION BUTTON -->
+    <tr>
+      <td style="padding:24px 32px 8px 32px;">
+        <table role="presentation" cellpadding="0" cellspacing="0">
+          <tr>
+            <!-- Button 1: View Build -->
+            <td>
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="$BUILD_URL" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#3730a3" fillcolor="#4338ca">
+                <w:anchorlock/>
+                <center style="color:#ffffff;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">View Build</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-->
+              <a href="$BUILD_URL" target="_blank" style="background-color:#7600fc1e; border:1px solid #3830a393; border-radius:6px; color:#ac00fc; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">View Build</a>
+              <!--<![endif]-->
+            </td>
+            <td style="width:10px; font-size:0; line-height:0;">&nbsp;</td>
+            <!-- Button 2: Console Output -->
+            <td>
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${BUILD_URL}console" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#0891b2" fillcolor="#ecfeff">
+                <w:anchorlock/>
+                <center style="color:#0e7490;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">Console Output</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-->
+              <a href="${BUILD_URL}console" target="_blank" style="background-color:#00defc2a; border:1px solid #01a1c9; border-radius:6px; color:#04bdf0; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Console Output</a>
+              <!--<![endif]-->
+            </td>
+            <td style="width:10px; font-size:0; line-height:0;">&nbsp;</td>
+            <!-- Button 3: Pipeline Overview -->
+            <td>
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${BUILD_URL}stages/" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#059669" fillcolor="#ecfdf5">
+                <w:anchorlock/>
+                <center style="color:#047857;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">Pipeline Overview</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-->
+              <a href="${BUILD_URL}stages/" target="_blank" style="background-color:#ecfdf5; border:1px solid #059669; border-radius:6px; color:#02d89b; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">Pipeline Overview</a>
+              <!--<![endif]-->
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- CONSOLE OUTPUT: __CONSOLE_LOG__ is a fully-rendered HTML block (one
+         styled box per line, and one box per source - upstream build +
+         this pipeline when triggered downstream, or just this pipeline
+         when run standalone). See generic_library.sendBuildEmail. -->
+    <tr>
+      <td style="padding:20px 32px 0 32px;">
+        <div style="font-size:17px; font-weight:600; color:#111827; margin-bottom:12px; padding-left:10px; border-left:4px solid #8b5cf6;">
+          📜 Console Output
+        </div>
+__CONSOLE_LOG__
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="padding:28px 32px; text-align:center;">
+        <div style="font-size:13px; color:#9ca3af; border-top:2px solid; border-image:linear-gradient(90deg, #6366f1, #06b6d4, #22c55e) 1; padding-top:16px;">
+          Sent by Jenkins &middot; <a href="$JENKINS_URL" style="color:#6366f1; text-decoration:none;">$JENKINS_URL</a><br>
+          $PROJECT_NAME &middot; Build #$BUILD_NUMBER
+        </div>
+      </td>
+    </tr>
+
+  </table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
