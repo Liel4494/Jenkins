@@ -1,56 +1,4 @@
-<!--
-  Jenkins Email-Ext HTML Template - RELEASE ANNOUNCEMENTS
-  =========================================================
-  Purpose: big celebratory banner for release-type pipelines (Dev-To-
-  Integration, Integration-To-Release, Hotfix, etc.) - distinct from the
-  compact build-status card in Build_Email.html. Use this template when
-  you want the email to read as an ANNOUNCEMENT ("Version Released!",
-  "Hotfix Deployed!", "Dev -> Integration Triggered!") rather than a
-  routine CI build result.
 
-  How to use (same rules as Build_Email.html - see that file for the full
-  explanation of why SCRIPT/FILE content tokens don't work in Pipeline):
-
-    generic_library.sendReleaseEmail(
-        requesterEmail,
-        'Jenkins CI <jenkins@ADOptimizer.rafael.co.il>',
-        '${JOB_NAME} - Release Notification',
-        'Jenkins_Release.html',
-
-        'Version Released!',                        // announcementTitle
-        "Version ${version} has been deployed to Integration"  // announcementSubtitle
-    )
-
-  The hero banner color AND emoji are hardcoded directly in the HTML below
-  (the emoji in the HERO / ANNOUNCEMENT BANNER div, the color on that same
-  block's background-color/background-image/bgcolor) - neither is a
-  parameter passed to sendReleaseEmail. To change them, edit the values
-  directly in this file. Suggested colors/emoji per pipeline type:
-    Dev-To-Integration     -> #2563eb (blue)   / 🔀
-    Integration-To-Release -> #7c3aed (violet, current default) / 🚀
-    Hotfix                 -> #dc2626 (red)    / 🔥
-
-  __ANNOUNCEMENT_TITLE__ / __ANNOUNCEMENT_SUBTITLE__ / __DURATION__ /
-  __NODE_NAME__ are custom placeholders (not real email-ext tokens)
-  substituted by generic_library.sendReleaseEmail (__DURATION__ /
-  __NODE_NAME__ are filled in automatically from currentBuild / env -
-  only the two announcement params need to be passed by the caller).
-
-  Real email-ext / Token Macro tokens used below (expand at send time,
-  same as Build_Email.html): CAUSE, BUILD_URL, BUILD_NUMBER, PROJECT_NAME,
-  JENKINS_URL. WARNING: never write real token names using ${...} syntax
-  in prose/comments here - TokenMacro.expandAll() scans the whole raw body
-  including comments, and a malformed match aborts expansion for the
-  ENTIRE email (see Build_Email.html header comment for full details).
-
-  Outlook compatibility notes (already applied below - keep them when
-  editing): only solid 6-digit hex colors (no #RRGGBBAA alpha-hex - Word's
-  engine can't parse it and drops the whole declaration); every colored
-  <td> also carries a legacy bgcolor="#rrggbb" attribute as a fallback
-  since Word frequently ignores CSS background-color on table cells; the
-  three action buttons use the same VML <v:roundrect> + MSO conditional
-  comment fallback pattern as Build_Email.html.
--->
 <html>
 <head>
 <meta charset="UTF-8">
@@ -64,60 +12,115 @@
 <td align="center">
 
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-
-    <!-- TOP ACCENT STRIPE -->
-    <tr>
-      <td style="height:6px; background-color:#111827; background-image:linear-gradient(90deg, #f59e0b 0%, #ec4899 50%, #7c3aed 100%); font-size:0; line-height:0;">&nbsp;</td>
-    </tr>
-
     <!-- HERO / ANNOUNCEMENT BANNER -->
     <tr>
-      <td style="background-color:#7c3aed; background-image:linear-gradient(90deg, #f59e0b 0%, #ec4899 50%, #7c3aed 100%); padding:48px 32px;" bgcolor="#7c3aed">
+      <td style="background-color:__BANNER_COLOR__; padding:32px 32px;" bgcolor="__BANNER_COLOR__">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td align="center" valign="middle" style="text-align:center;">
+            <td align="center" valign="top" style="text-align:center;">
               <div style="color:#ffffff; font-size:30px; font-weight:800; letter-spacing:0.3px; margin-bottom:10px;">
                 __ANNOUNCEMENT_TITLE__
               </div>
-              <div style="color:#ffffff; font-size:16px; font-weight:500; opacity:0.92;">
+              <div style="color:#ffffff; font-size:20px; font-weight:600; opacity:0.92;">
                 __ANNOUNCEMENT_SUBTITLE__
               </div>
-              <div style="margin-top:18px;">
-                <span style="display:inline-block; background-color:rgba(255,255,255,0.18); color:#ffffff; font-size:13px; font-weight:700; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;">
-                  $PROJECT_NAME &middot; Build #$BUILD_NUMBER
-                </span>
+              <div style="line-height:28px; font-size:1px;">&nbsp;</div>
+              <div>
+                <!--[if mso]>
+                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" style="height:48px;width:340px;v-text-anchor:middle;" arcsize="50%" stroke="f" fillcolor="__BADGE_COLOR__">
+                  <center style="color:#ffffff;font-family:'Segoe UI',Arial,sans-serif;font-size:16px;font-weight:700;">$PROJECT_NAME &middot; Build #$BUILD_NUMBER</center>
+                </v:roundrect>
+                <![endif]-->
+                <!--[if !mso]><!-->
+                <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
+                  <tr>
+                    <td style="background-color:__BADGE_COLOR__; border-radius:24px; padding:16px 20px; color:#ffffff; font-size:16px; font-weight:700; letter-spacing:0.5px; white-space:nowrap;" bgcolor="__BADGE_COLOR__">
+                      $PROJECT_NAME &middot; Build #$BUILD_NUMBER
+                    </td>
+                  </tr>
+                </table>
+                <!--<![endif]-->
               </div>
             </td>
             <td align="right" valign="middle" width="100" style="font-size:100px; line-height:1;">
-              🚀
+              __EMOJI__
             </td>
           </tr>
         </table>
       </td>
     </tr>
 
-    <!-- SUMMARY CARDS: Triggered by / Node / Duration side-by-side -->
+    <!-- SUMMARY CARDS: Triggered by / Node / Duration side-by-side.
+         Rounded corners EVERYWHERE, including classic Outlook desktop:
+         the Word engine ignores CSS border-radius, so each card wraps its
+         two-line content in a VML <v:roundrect>+<v:textbox>. Outlook paints
+         the rounded fill from the VML shape (and ignores the inner div's
+         background-color, which Word doesn't render on bare divs), while
+         every non-Outlook client ignores the mso-only VML comments and
+         renders the rounded <div> directly. Keeping BOTH lines inside a
+         single wrapper div (not merged onto one run) preserves the
+         title-over-value layout. All three VML shapes share one fixed
+         height (120px) with v-text-anchor:middle so the cards stay equal
+         height in Outlook no matter how long a value is; non-Outlook clients
+         equalize automatically because the cards share one table row. -->
     <tr>
       <td style="padding:28px 32px 0 32px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td width="33%" valign="top" style="padding:16px 12px; background-color:#fdf4ff; border-radius:8px; text-align:center;" bgcolor="#fdf4ff">
-              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#a21caf; margin-bottom:4px;">Triggered by <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#128640;</span></div>
-              <div style="font-size:14px; font-weight:600; color:#111827; word-break:break-word;">$CAUSE</div>
+            <td width="33%" valign="top">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" arcsize="11%" fillcolor="#fdf4ff" stroked="f" style="width:168px;height:120px;v-text-anchor:middle;">
+              <v:textbox inset="8px,12px,8px,12px">
+              <![endif]-->
+              <div style="background-color:#fdf4ff; border-radius:12px; padding:16px 12px; text-align:center;">
+                <div style="font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:#a21caf; text-align:center;">Triggered by <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#128640;</span></div>
+                <div style="font-size:14px; font-weight:600; color:#111827; text-align:center;">$CAUSE</div>
+              </div>
+              <!--[if mso]>
+              </v:textbox>
+              </v:roundrect>
+              <![endif]-->
             </td>
             <td style="width:12px; font-size:0; line-height:0;">&nbsp;</td>
-            <td width="33%" valign="top" style="padding:16px 12px; background-color:#ecfeff; border-radius:8px; text-align:center;" bgcolor="#ecfeff">
-              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#0e7490; margin-bottom:4px;">Node <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#128421;&#65039;</span></div>
-              <div style="font-size:14px; font-weight:600; color:#111827; word-break:break-word;">__NODE_NAME__</div>
+            <td width="33%" valign="top">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" arcsize="11%" fillcolor="#ecfeff" stroked="f" style="width:168px;height:120px;v-text-anchor:middle;">
+              <v:textbox inset="8px,12px,8px,12px">
+              <![endif]-->
+              <div style="background-color:#ecfeff; border-radius:12px; padding:16px 12px; text-align:center;">
+                <div style="font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:#0e7490; text-align:center;">Node <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#128421;&#65039;</span></div>
+                <div style="font-size:14px; font-weight:600; color:#111827; text-align:center;">__NODE_NAME__</div>
+              </div>
+              <!--[if mso]>
+              </v:textbox>
+              </v:roundrect>
+              <![endif]-->
             </td>
             <td style="width:12px; font-size:0; line-height:0;">&nbsp;</td>
-            <td width="33%" valign="top" style="padding:16px 12px; background-color:#fef9c3; border-radius:8px; text-align:center;" bgcolor="#fef9c3">
-              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#a16207; margin-bottom:4px;">Duration <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#9203;&#65039;</span></div>
-              <div style="font-size:14px; font-weight:600; color:#111827; word-break:break-word;">__DURATION__</div>
+            <td width="33%" valign="top">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" arcsize="11%" fillcolor="#fef9c3" stroked="f" style="width:168px;height:120px;v-text-anchor:middle;">
+              <v:textbox inset="8px,12px,8px,12px">
+              <![endif]-->
+              <div style="background-color:#fef9c3; border-radius:12px; padding:16px 12px; text-align:center;">
+                <div style="font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:#a16207; text-align:center;">Duration <span style="font-size:22px; text-transform:none; letter-spacing:normal; vertical-align:middle;">&#9203;&#65039;</span></div>
+                <div style="font-size:14px; font-weight:600; color:#111827; text-align:center;">__DURATION__</div>
+              </div>
+              <!--[if mso]>
+              </v:textbox>
+              </v:roundrect>
+              <![endif]-->
             </td>
           </tr>
         </table>
       </td>
+    </tr>
+
+    <!-- Spacer row: guarantees a gap below the cards. The cards' VML shapes
+         auto-grow with content and can overlap the next row in Outlook, so a
+         real <tr> here reserves vertical space Word won't let the shape cover. -->
+    <tr>
+      <td height="24" style="height:24px; line-height:24px; font-size:1px;">&nbsp;</td>
     </tr>
 
     <!-- ACTION BUTTONS -->
@@ -128,13 +131,13 @@
             <!-- Button 1: View Build -->
             <td>
               <!--[if mso]>
-              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="$BUILD_URL" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#3730a3" fillcolor="#4338ca">
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="$BUILD_URL" style="height:44px;v-text-anchor:middle;width:170px;" arcsize="16%" stroke="t" strokecolor="#7c3aed" fillcolor="#f3e8ff">
                 <w:anchorlock/>
-                <center style="color:#ffffff;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">View Build</center>
+                <center style="color:#6d28d9;font-family:'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;">View Build</center>
               </v:roundrect>
               <![endif]-->
               <!--[if !mso]><!-->
-              <a href="$BUILD_URL" target="_blank" style="background-color:#7600fc1e; border:1px solid #3830a393; border-radius:6px; color:#ac00fc; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">View Build</a>
+              <a href="$BUILD_URL" target="_blank" style="background-color:#f3e8ff; border:1px solid #7c3aed; border-radius:6px; color:#6d28d9; display:inline-block; font-family:'Segoe UI',Arial,sans-serif; font-size:15px; font-weight:600; line-height:42px; text-align:center; text-decoration:none; width:168px;">View Build</a>
               <!--<![endif]-->
             </td>
             <td style="width:10px; font-size:0; line-height:0;">&nbsp;</td>
@@ -171,7 +174,7 @@
     <!-- FOOTER -->
     <tr>
       <td style="padding:28px 32px; text-align:center;">
-        <div style="font-size:13px; color:#9ca3af; border-top:2px solid; border-image:linear-gradient(90deg, #f59e0b, #ec4899, #7c3aed) 1; padding-top:16px;">
+        <div style="font-size:13px; color:#9ca3af; border-top:2px solid #7c3aed; padding-top:16px;">
           Sent by Jenkins &middot; <a href="$JENKINS_URL" style="color:#7c3aed; text-decoration:none;">$JENKINS_URL</a><br>
           $PROJECT_NAME &middot; Build #$BUILD_NUMBER
         </div>
