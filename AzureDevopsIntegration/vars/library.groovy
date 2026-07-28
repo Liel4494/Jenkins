@@ -15,7 +15,7 @@ def getLatestIterationID(creds, collection, project, repo, prId){
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations?includeCommits=true&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations?includeCommits=true&api-version=6.0",
         wrapAsMultipart: false
 
     if (response.status != 200 && response.status != 201) {
@@ -55,7 +55,7 @@ def updateAzureStatusCheck(collection, project, repo, prId, status, validationNa
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops..co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/statuses?api-version=6.0-preview.1",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/statuses?api-version=6.0-preview.1",
         wrapAsMultipart: false
     
     if (response.status != 200 && response.status != 201) {
@@ -76,7 +76,7 @@ def getPullRequestChanges(collection, project, repo, prId, creds) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops..co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations/${iterationId}/changes?api-version=7.1",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/pullRequests/${prId}/iterations/${iterationId}/changes?api-version=7.1",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -132,7 +132,7 @@ def getCommitChanges(collection, project, repo, branch, creds) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits/${commitId}/changes?api-version=7.1",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits/${commitId}/changes?api-version=7.1",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -219,7 +219,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
 
     if (commitResponse.status != 200) {
@@ -254,7 +254,7 @@ def pushToRepo(creds, collection, project, destinationRepo, branch, fileLocalPat
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/pushes?api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${destinationRepo}/pushes?api-version=6.0",
         wrapAsMultipart: false
 
     if (pushResponse.status == 201) {
@@ -296,7 +296,7 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag, vers
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.itemVersion.versionType=${versionType}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/commits?searchCriteria.itemVersion.version=${branchToTag}&searchCriteria.itemVersion.versionType=${versionType}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
     
     def commitId
@@ -329,7 +329,7 @@ def createTag(creds, collection, projectToTag, repoToTag, branchToTag, tag, vers
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/annotatedtags?api-version=6.0-preview",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectToTag}/_apis/git/repositories/${repoToTag}/annotatedtags?api-version=6.0-preview",
         wrapAsMultipart: false
 
     if (tagResponse.status == 201) {
@@ -370,7 +370,7 @@ def deleteTag(creds, collection, project, repo, tag) {
         requestBody: body,
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=6.0-preview",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/refs?api-version=6.0-preview",
         wrapAsMultipart: false
 
     if (deleteResponse.status == 200) {
@@ -401,7 +401,7 @@ def downloadFile(creds, collection, projectName, fileRepo, filePath, fileBranch,
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${fileRepo}/items?path=${filePath}&versionType=Branch&version=${fileBranch}&download=true&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${fileRepo}/items?path=${filePath}&versionType=Branch&version=${fileBranch}&download=true&api-version=6.0",
         wrapAsMultipart: false
 
     if (fileResponse.status != 200) {
@@ -462,7 +462,7 @@ def getLatestArtifactoryVersion(String artifactoryCreds, jf_path) {
     def jfrogCliPath = tool name: 'jfrog-cli', type: 'jfrog'
     withCredentials([usernamePassword(credentialsId: artifactoryCreds, passwordVariable: 'JFROG_ACCESS_TOKEN', usernameVariable: 'username')]) {
         searchResult = sh(
-            script: "${jfrogCliPath}/jf rt search --url=https://artifactory.myDomain.co.il/artifactory --access-token=\$JFROG_ACCESS_TOKEN ${jf_path}",
+            script: "${jfrogCliPath}/jf rt search --url=https://artifactory.rafael.co.il/artifactory --access-token=\$JFROG_ACCESS_TOKEN ${jf_path}",
             returnStdout: true
         ).trim()
     }
@@ -565,7 +565,7 @@ def getLastCommitID(creds, collection, project, repo, branch) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/commits?searchCriteria.itemVersion.version=${branch}&searchCriteria.\$top=1&api-version=6.0",
         wrapAsMultipart: false
 
     if (commitResponse.status != 200) {
@@ -598,7 +598,7 @@ def findTag(creds, collection, projectName, repoName, tagToSearch) {
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:500',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
         wrapAsMultipart: false
 
     if (tagsResponse.status != 200) {
@@ -639,7 +639,7 @@ def getLastVersionTag(creds, collection, projectName, repoName, tagToSearch) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
+        url: "https://azuredevops.rafael.co.il/${collection}/${projectName}/_apis/git/repositories/${repoName}/refs?api-version=6.0&filter=tags/${tagToSearch}",
         wrapAsMultipart: false
 
     if (tagsResponse.status != 200) {
@@ -714,7 +714,7 @@ def uploadToWiki(creds, collection, project, wikiFileDirectory, markdownContent)
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:599',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
         wrapAsMultipart: false
 
     if (response.status == 201) {
@@ -758,7 +758,7 @@ def checkWikiPathExist(creds, collection, project, wikiFileDirectory, markdownCo
         ignoreSslErrors: true,
         responseHandle: 'NONE',
         validResponseCodes: '100:599',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/pages?path=${wikiFileDirectory}&api-version=6.0",
         wrapAsMultipart: false
 
     if (checkResponse.status == 200) {
@@ -830,7 +830,7 @@ def uploadWikiAttachments(creds, collection, project, String attachmentList) {
                     -H "Content-Type: application/octet-stream" \\
                     --data-binary @"${attachment}" \\
                     -o /dev/null -w "%{http_code}" \\
-                    "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/attachments?name=${attachmentName}&api-version=6.0"
+                    "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/wiki/wikis/${project}.wiki/attachments?name=${attachmentName}&api-version=6.0"
                 """,
                 returnStdout: true
             ).trim()
@@ -935,7 +935,7 @@ def getDirectoryPath(creds, collection, project, repo, branch, String dirName) {
         httpMode: "GET",
         ignoreSslErrors: true,
         responseHandle: 'NONE',
-        url: "https://azuredevops.myDomain.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&recursionLevel=Full",
+        url: "https://azuredevops.rafael.co.il/${collection}/${project}/_apis/git/repositories/${repo}/items?versionDescriptor.version=${branch}&api-version=7.1&recursionLevel=Full",
         wrapAsMultipart: false
 
     if (response.status != 200) {
@@ -962,4 +962,137 @@ def getDirectoryPath(creds, collection, project, repo, branch, String dirName) {
         error("# Exiting: Directory Not Found - Stopping Build.")
     }
     return dirPath
+}
+
+
+def sendBuildEmail(creds, to, from, subject , collection, project, repo, branch) {
+    downloadFile(creds, collection, project, repo, "Emails/Build_Email.html", branch, "Jenkins_Build.html", printFile = false)
+    def htmlBody = readFile("Jenkins_Build.html")
+
+    def statusColor = [
+        SUCCESS : '#16a34a',
+        FAILURE : '#dc2626',
+        UNSTABLE: '#f59e0b',
+        ABORTED : '#6b7280'
+    ].get(currentBuild.currentResult, '#6b7280')
+
+    def upstreamLabelColor = '#22c5ee'
+    def ownLabelColor = '#a78bfa'
+    def escapeHtml = { s -> s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;') }
+
+    // Render one <div> per log line instead of a single blob of text joined
+    // by '\n'. Outlook's Word rendering engine ignores CSS white-space
+    // (pre/pre-wrap) and collapses newlines, turning a joined  tring into an
+    // unreadable wall of text - a real block element per line sidesteps that.
+    // NOTE: use an explicit index counter, not withIndex().collect { line, idx -> }
+    // - under Jenkins' CPS transformation that two-arg closure destructuring
+    // doesn't bind `idx`, leaving it null and blowing up on `idx % 2`.
+    // NOTE: per-line padding must be on a <td>, not a <div> - Outlook's Word
+    // engine unreliably ignores CSS padding (and margin) on <div> elements,
+    // which left the log text flush against each line's background edges.
+    // <td> padding is honored reliably (same as the working summary cards).
+    def renderConsoleLines = { logLines ->
+        def rows = []
+        for (int i = 0; i < logLines.size(); i++) {
+            def bg = (i % 2 == 0) ? '#0f172a' : '#16213a'
+            rows << "<tr><td style=\"padding:2px 10px; background-color:${bg};\" bgcolor=\"${bg}\">${escapeHtml(logLines[i]) ?: '&nbsp;'}</td></tr>"
+        }
+        "<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">${rows.join('')}</table>"
+    }
+
+    // labelColor lets the caller pick the headline color per section
+    // (e.g. a different color for the upstream build vs this pipeline).
+    def renderConsoleSection = { logLines, label, labelColor ->
+        def heading = label ? "<div style=\"font-size:17px; font-weight:700; color:${labelColor}; margin:0 0 8px 0;\">${label}</div>" : ''
+        heading +
+        "<div style=\"font-size:13px; color:#a5f3fc; background-color:#0f172a; border-radius:4px; padding:8px 0; margin-bottom:12px; max-height:260px; overflow:auto; font-family:Consolas, monospace;\">" +
+        renderConsoleLines(logLines) +
+        "</div>"
+    }
+
+    // If this job was triggered downstream via `build job:`, show BOTH the
+    // upstream build's console (the real build being reported on) and this
+    // pipeline's own console, each in its own labeled section. If run
+    // standalone, show only this pipeline's own console.
+    // The Cause/Job/Run objects looked up here are Jenkins internal model
+    // objects, NOT Serializable - so they're fetched inside a @NonCPS
+    // helper (collectConsoleData) and never held in a CPS-scoped local
+    // variable, otherwise the next pipeline step boundary would try to
+    // checkpoint them and throw NotSerializableException.
+    def consoleData = collectConsoleData()
+    def consoleHtml
+    if (consoleData.hasUpstream) {
+        consoleHtml = renderConsoleSection(consoleData.upstreamLines, "Upstream Build: ${consoleData.upstreamProject} #${consoleData.upstreamBuild}", upstreamLabelColor) +
+                      renderConsoleSection(consoleData.ownLines, "This Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}", ownLabelColor)
+    } else {
+        consoleHtml = renderConsoleSection(consoleData.ownLines, null, ownLabelColor)
+    }
+
+    htmlBody = htmlBody
+        .replace('__STATUS_COLOR__', statusColor)
+        .replace('__DURATION__', currentBuild.durationString.replace(' and counting', ''))
+        .replace('__NODE_NAME__', env.NODE_NAME)
+        .replace('__CONSOLE_LOG__', consoleHtml)
+
+    emailext(
+        subject: subject,
+        body: htmlBody,
+        to: to,
+        from: from,
+        mimeType: 'text/html'
+    )
+}
+
+// Sends the big-banner RELEASE ANNOUNCEMENT email (Release_Email.html) -
+// distinct from sendBuildEmail's compact build-status card. Use this for
+// release-type pipelines (Dev-To-Integration, Integration-To-Release,
+// Hotfix, etc.) where the email should read as an announcement rather
+// than a routine CI build result.
+// emoji: the large emoji shown next to the banner text (e.g. a rocket emoji).
+// bannerColor: hex color for the hero banner background (e.g. '#3a79ed').
+// badgeColor: hex color for the "$PROJECT_NAME · Build #$BUILD_NUMBER" pill (e.g. '#ff4b90').
+def sendReleaseEmail(creds, to, from, subject, announcementTitle, announcementSubtitle, emoji, bannerColor, badgeColor, collection, project, repo, branch) {
+    downloadFile(creds, collection, project, repo, "Emails/Release_Email.html", branch, "Release_Email.html", printFile = false)
+
+    def htmlBody = readFile("Release_Email.html")
+
+    htmlBody = htmlBody
+        .replace('__ANNOUNCEMENT_TITLE__', announcementTitle)
+        .replace('__ANNOUNCEMENT_SUBTITLE__', announcementSubtitle)
+        .replace('__DURATION__', currentBuild.durationString.replace(' and counting', ''))
+        .replace('__NODE_NAME__', env.NODE_NAME)
+        .replace('__EMOJI__', emoji)
+        .replace('__BANNER_COLOR__', bannerColor)
+        .replace('__BADGE_COLOR__', badgeColor)
+
+    emailext(
+        subject: subject,
+        body: htmlBody,
+        to: to,
+        from: from,
+        mimeType: 'text/html'
+    )
+}
+
+// Fetches the upstream/own console log tails as plain Strings/Lists only
+// (no Cause/Job/Run objects survive past this method's return) so the
+// result is safe to hold as a local variable across later pipeline steps.
+@NonCPS
+private Map collectConsoleData() {
+    def cause = currentBuild.rawBuild.getCause(hudson.model.Cause.UpstreamCause)
+    if (cause) {
+        def upstreamJob = jenkins.model.Jenkins.get().getItemByFullName(cause.upstreamProject)
+        def upstreamRun = upstreamJob?.getBuildByNumber(cause.upstreamBuild)
+        return [
+            hasUpstream    : true,
+            upstreamProject: cause.upstreamProject,
+            upstreamBuild  : cause.upstreamBuild,
+            upstreamLines  : upstreamRun ? upstreamRun.getLog(60) : ['No upstream build log available.'],
+            ownLines       : currentBuild.rawBuild.getLog(60)
+        ]
+    }
+    return [
+        hasUpstream: false,
+        ownLines   : currentBuild.rawBuild.getLog(60)
+    ]
 }
