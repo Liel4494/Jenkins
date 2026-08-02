@@ -15,9 +15,9 @@
 
        def htmlBody = readFile('Jenkins_Build.html')
 
-       // __STATUS_COLOR__, __DURATION__, __NODE_NAME__, __CONSOLE_LOG__ are
-       // NOT real email-ext tokens (no such tokens exist in the plugin's
-       // Content Token Reference) so substitute them manually before
+       // __STATUS_COLOR__, __DURATION__, __NODE_NAME__, __CONSOLE_LOG__,
+       // __FAILED_STAGE__ are NOT real email-ext tokens (no such tokens
+       // exist in the plugin's Content Token Reference) so substitute them manually before
        // handing the string to emailext. Also set currentBuild.result
        // explicitly in any catch block BEFORE this runs - error() alone
        // doesn't update it until the whole script exits, so a caught/
@@ -61,10 +61,12 @@
   Tokens used below are all verified against the Content Token Reference
   (email-ext's own private macros + the bundled Token Macro plugin):
   BUILD_STATUS, BUILD_NUMBER, PROJECT_NAME, CAUSE, BUILD_URL, JENKINS_URL.
-  __STATUS_COLOR__ / __DURATION__ / __NODE_NAME__ / __CONSOLE_LOG__ are
-  custom placeholders (not plugin tokens) substituted in Groovy above —
-  __CONSOLE_LOG__ is pre-rendered HTML (one section per source, one <div>
-  per line) rather than plain text; see generic_library.sendBuildEmail.
+  __STATUS_COLOR__ / __DURATION__ / __NODE_NAME__ / __CONSOLE_LOG__ /
+  __FAILED_STAGE__ are custom placeholders (not plugin tokens) substituted
+  in Groovy above — __CONSOLE_LOG__ is pre-rendered HTML (one section per
+  source, one <div> per line) rather than plain text; __FAILED_STAGE__'s
+  surrounding <tr> is stripped out entirely on a SUCCESS build rather than
+  left blank; see generic_library.sendBuildEmail.
   (Deliberately not shown here using real ${...} syntax — see the WARNING
   above.)
 
@@ -123,6 +125,12 @@
             <td style="padding:12px 16px; font-size:15px; color:#f59e0b; font-weight:600; border-left:3px solid #f59e0b; background-color:#fef9c3;" bgcolor="#fef9c3">⏱️ Duration</td>
             <td style="padding:12px 16px; font-size:15px; color:#111827; font-weight:500; background-color:#fef9c3;" bgcolor="#fef9c3">__DURATION__</td>
           </tr>
+          <!--__FAILED_STAGE_ROW_START__-->
+          <tr>
+            <td style="padding:12px 16px; font-size:15px; color:#dc2626; font-weight:600; border-left:3px solid #dc2626; background-color:#fef2f2;" bgcolor="#fef2f2">⛔ Failed Stage</td>
+            <td style="padding:12px 16px; font-size:15px; color:#111827; font-weight:500; background-color:#fef2f2;" bgcolor="#fef2f2">__FAILED_STAGE__</td>
+          </tr>
+          <!--__FAILED_STAGE_ROW_END__-->
         </table>
       </td>
     </tr>
