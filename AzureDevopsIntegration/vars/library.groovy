@@ -994,6 +994,9 @@ def sendBuildEmail(creds, to, from, subject , collection, project, repo, branch)
         ABORTED : '#6b7280'
     ].get(currentBuild.currentResult, '#6b7280')
 
+    // Only look up a failed stage when the build didn't succeed.
+    def failedStageName = (currentBuild.currentResult != 'SUCCESS') ? getFailedStageName() : null
+
     def upstreamLabelColor = '#22c5ee'
     def ownLabelColor = '#a78bfa'
     def escapeHtml = { s -> s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;') }
@@ -1052,6 +1055,11 @@ def sendBuildEmail(creds, to, from, subject , collection, project, repo, branch)
         .replace('__NODE_NAME__', env.NODE_NAME)
         .replace('__CONSOLE_LOG__', consoleHtml)
 
+    // Row markers let us drop the whole <tr> on success instead of leaving a blank value.
+    htmlBody = failedStageName
+        ? htmlBody.replaceAll(/(?s)<!--__FAILED_STAGE_ROW_START__-->|<!--__FAILED_STAGE_ROW_END__-->/, '').replace('__FAILED_STAGE__', escapeHtml(failedStageName))
+        : htmlBody.replaceAll(/(?s)<!--__FAILED_STAGE_ROW_START__-->.*?<!--__FAILED_STAGE_ROW_END__-->/, '')
+
     emailext(
         subject: subject,
         body: htmlBody,
@@ -1090,6 +1098,34 @@ def sendReleaseEmail(creds, to, from, subject, announcementTitle, announcementSu
         from: from,
         mimeType: 'text/html'
     )
+}
+
+// Walks the FlowNode graph to find which stage was executing when the build
+// failed: first node carrying an ErrorAction, then its nearest enclosing
+// stage's LabelAction. Returns a plain String (or null) - the FlowNode/
+// execution objects themselves are never returned, same reasoning as
+// collectConsoleData below (they aren't Serializable).
+@NonCPS
+private String getFailedStageName() {
+    def execution = currentBuild.rawBuild.getExecution()
+    if (!execution) return null
+
+    for (def head : execution.getCurrentHeads()) {
+        def node = head
+        while (node != null) {
+            if (node.getAction(org.jenkinsci.plugins.workflow.actions.ErrorAction) != null) {
+                for (def enclosing : node.getEnclosingBlocks()) {
+                    def label = enclosing.getAction(org.jenkinsci.plugins.workflow.actions.LabelAction)
+                    if (label != null) {
+                        return label.getDisplayName()
+                    }
+                }
+            }
+            def parents = node.getParents()
+            node = parents ? parents[0] : null
+        }
+    }
+    return null
 }
 
 // Fetches the upstream/own console log tails as plain Strings/Lists only
