@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     ports:
       # We map host 443 to the HTTPS port we define below
-      - "443:8443"
+      - "8443:8443"
       - "50000:50000"
     volumes:
       - /var/jenkins_master:/var/jenkins_home
@@ -36,6 +36,6 @@ services:
     volumes:
       - /var/slave_workspace:/home/jenkins/agent
     environment:
-      - JENKINS_URL=https://jenkins-master:8433
+      - JENKINS_URL=https://jenkins-master:8443
       - JENKINS_AGENT_NAME=jenkins-slave
       - JENKINS_SECRET=Aa123456
